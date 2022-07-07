@@ -2,6 +2,10 @@ import logo from "./logo.svg";
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import { loadContract } from "./utils/contract";
+import { Buffer } from 'buffer';
+
+// @ts-ignore
+window.Buffer = Buffer;
 
 function App() {
   const [walletName, setWalletName] = useState("");
