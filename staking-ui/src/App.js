@@ -11,12 +11,24 @@ function App() {
     console.log(tokenId);
   }, [walletName, tokenId]);
 
+  const stake = () => {
+    
+  };
+  
+  const claim = () => {
+    
+  };
+  
+  const unStake = () => {
+    
+  };
+
   return (
     <div className="App">
       <header className="App-header">
         <div class="mb-3">
           <label for="exampleFormControlInput1" class="form-label">
-            Wallet User
+            {walletName}
           </label>
           <input
             type="text"
@@ -42,17 +54,17 @@ function App() {
         </div>
         <div class="row">
           <div class="col">
-            <button type="button" class="btn btn-light">
+            <button type="button" class="btn btn-light" onClick={stake}>
               Stake
             </button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-light">
+            <button type="button" class="btn btn-light" onClick={claim}>
               Claim
             </button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-light">
+            <button type="button" class="btn btn-light" onClick={unStake}>
               Unstake
             </button>
           </div>
