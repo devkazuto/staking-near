@@ -12,7 +12,7 @@ use near_sdk::{
 mod nft_callbacks;
 
 pub const GAS_FOR_FT_TRANSFER: Gas = 10_000_000_000_000;
-pub const GAS_FOR_NFT_TRANSFER: Gas = 20_000_000_000_000;
+pub const GAS_FOR_NFT_TRANSFER: Gas = 2_428_055_156_040;
 
 // pub const DENOM: u128 = 1_000_000_000_000_000_000_000_000;
 pub const DENOM: u128 = 100_000_000;
@@ -388,16 +388,16 @@ impl Contract {
                     }
 
                     self.staked.insert(&caller, &new_vec);
-                    log!("{}", reward);
+                    // log!("{}", reward);
 
-                    // ftext::ft_transfer(
-                    //     env::predecessor_account_id().clone(),
-                    //     reward.into(),
-                    //     Some(String::from("claim reward")),
-                    //     self.ft_account.clone(),           // contract account id
-                    //     1,                                 // yocto NEAR to attach
-                    //     near_sdk::Gas(10_000_000_000_000), // gas to attach
-                    // );
+                    ftext::ft_transfer(
+                        env::predecessor_account_id().clone(),
+                        reward.into(),
+                        Some(String::from("claim reward")),
+                        &self.ft_account.clone(), // contract account id
+                        1,                        // yocto NEAR to attach
+                        GAS_FOR_FT_TRANSFER.into(),      // gas to attach
+                    );
                 }
                 None => {
                     log!("You are not valid claimer.");

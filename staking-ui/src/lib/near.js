@@ -1,4 +1,4 @@
-const CONTRACT_NAME = process.env.STAKE_CONTRACT_ID || 'staking2.minimous34.testnet'
+const STAKE_CONTRACT_ID = process.env.STAKE_CONTRACT_ID || 'staking2.minimous34.testnet'
 
 export default function getConfig(env) {
 	switch (env) {
@@ -7,7 +7,7 @@ export default function getConfig(env) {
 			return {
 				networkId: 'mainnet',
 				nodeUrl: 'https://rpc.mainnet.near.org',
-				contractName: CONTRACT_NAME,
+				contractName: STAKE_CONTRACT_ID,
 				walletUrl: 'https://wallet.near.org',
 				helperUrl: 'https://helper.mainnet.near.org',
 				explorerUrl: 'https://explorer.mainnet.near.org',
@@ -17,7 +17,7 @@ export default function getConfig(env) {
 			return {
 				networkId: 'default',
 				nodeUrl: 'https://rpc.testnet.near.org',
-				contractName: CONTRACT_NAME,
+				contractName: STAKE_CONTRACT_ID,
 				walletUrl: 'https://wallet.testnet.near.org',
 				helperUrl: 'https://helper.testnet.near.org',
 				explorerUrl: 'https://explorer.testnet.near.org',
@@ -26,7 +26,7 @@ export default function getConfig(env) {
 			return {
 				networkId: 'devnet',
 				nodeUrl: 'https://rpc.devnet.near.org',
-				contractName: CONTRACT_NAME,
+				contractName: STAKE_CONTRACT_ID,
 				walletUrl: 'https://wallet.devnet.near.org',
 				helperUrl: 'https://helper.devnet.near.org',
 			}
@@ -34,7 +34,7 @@ export default function getConfig(env) {
 			return {
 				networkId: 'betanet',
 				nodeUrl: 'https://rpc.betanet.near.org',
-				contractName: CONTRACT_NAME,
+				contractName: STAKE_CONTRACT_ID,
 				walletUrl: 'https://wallet.betanet.near.org',
 				helperUrl: 'https://helper.betanet.near.org',
 			}
@@ -44,21 +44,21 @@ export default function getConfig(env) {
 				nodeUrl: 'http://localhost:3030',
 				keyPath: `${process.env.HOME}/.near/validator_key.json`,
 				walletUrl: 'http://localhost:4000/wallet',
-				contractName: CONTRACT_NAME,
+				contractName: STAKE_CONTRACT_ID,
 			}
 		case 'test':
 		case 'ci':
 			return {
 				networkId: 'shared-test',
 				nodeUrl: 'https://rpc.ci-testnet.near.org',
-				contractName: CONTRACT_NAME,
+				contractName: STAKE_CONTRACT_ID,
 				masterAccount: 'test.near',
 			}
 		case 'ci-betanet':
 			return {
 				networkId: 'shared-test-staging',
 				nodeUrl: 'https://rpc.ci-betanet.near.org',
-				contractName: CONTRACT_NAME,
+				contractName: STAKE_CONTRACT_ID,
 				masterAccount: 'test.near',
 			}
 		default:
