@@ -9,7 +9,7 @@ function App() {
   useEffect(() => {
     console.log(walletName);
     console.log(tokenId);
-  }, []);
+  }, [walletName, tokenId]);
 
   return (
     <div className="App">
@@ -21,7 +21,6 @@ function App() {
           <input
             type="text"
             class="form-control"
-            id="exampleFormControlInput1"
             placeholder="user.testnet"
             onChange={(e) => {
               setWalletName(e.target.value);
@@ -35,7 +34,6 @@ function App() {
           <input
             type="text"
             class="form-control"
-            id="exampleFormControlInput1"
             placeholder="0"
             onChange={(e) => {
               setTokenId(e.target.value);
