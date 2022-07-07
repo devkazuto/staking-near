@@ -15,7 +15,7 @@ export default function getConfig(env) {
 		case 'development':
 		case 'testnet':
 			return {
-				networkId: 'default',
+				networkId: 'testnet',
 				nodeUrl: 'https://rpc.testnet.near.org',
 				contractName: STAKE_CONTRACT_ID,
 				walletUrl: 'https://wallet.testnet.near.org',
