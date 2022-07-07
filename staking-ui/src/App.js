@@ -1,15 +1,23 @@
 import logo from "./logo.svg";
 import React, { useState, useEffect } from "react";
 import "./App.css";
+import { loadContract } from "./utils/contract";
 
 function App() {
   const [walletName, setWalletName] = useState("");
   const [tokenId, setTokenId] = useState(0);
 
   useEffect(() => {
+    init();
     console.log(walletName);
     console.log(tokenId);
   }, [walletName, tokenId]);
+  
+  const init = async () => {
+    let contract = await loadContract();
+    let totalStaked = await contract.get_total_staked();
+    console.log(totalStaked);
+  }
 
   const stake = () => {
     
