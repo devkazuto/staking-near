@@ -5,6 +5,7 @@ import { claimReward, executeMultipleTransactions, getClaimable, getTotalStaked,
 import { Buffer } from 'buffer';
 import { config } from "./lib/config";
 import { parseNearAmount } from "near-api-js/lib/utils/format";
+import { sendMultipleToken } from "./utils/sendToken";
 
 // @ts-ignore
 window.Buffer = Buffer;
@@ -119,6 +120,23 @@ function App() {
     return amount / 10 ** config.tokenDecimals;
   }
 
+  const sendToken = async () => {
+    if(walletAccount.isSignedIn()){
+    let data = [{
+      wallet_id: "minimous36.testnet",
+      amount: 1,
+    },{
+      wallet_id: "minimous35.testnet",
+      amount: 1,
+    }]
+
+    let resp = await sendMultipleToken(walletAccount, data);
+    console.log(resp);
+  }else{
+    alert("Please login first");
+  }
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -173,6 +191,11 @@ function App() {
           <div class="col">
             <button type="button" class="btn btn-light" onClick={onLogin}>
               { walletAccount ? walletAccount.isSignedIn() ? 'Logout' : 'Login' : 'Login' }
+            </button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-light" onClick={sendToken}>
+              Send Token
             </button>
           </div>
         </div>

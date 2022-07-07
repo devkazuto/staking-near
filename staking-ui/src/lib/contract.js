@@ -146,6 +146,14 @@ export const executeMultipleTransactions = async (transactions, callbackUrl) => 
     })
 }
 
+export const formatToken = (amount) => {
+    return amount / 10 ** config.tokenDecimals;
+}
+
+export const parserToken = (amount) => {
+    return amount * 10 ** config.tokenDecimals;
+}
+
 /**
  * 
  * End Utils
