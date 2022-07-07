@@ -3,6 +3,22 @@ import {
     config,
     viewMethodsStaking
 } from "./config";
+import {
+    base_decode
+} from 'near-api-js/lib/utils/serialize'
+import {
+    PublicKey
+} from 'near-api-js/lib/utils'
+import {
+    createTransaction,
+    functionCall
+} from 'near-api-js/lib/transaction'
+
+/** 
+ * 
+ * Begin Utils
+ * 
+ */
 
 export const loadContract = async (contract_id) => {
 
@@ -38,12 +54,12 @@ export const getWalletAccount = async () => {
         }
     }, config));
     let walletAccount = new nearAPI.WalletAccount(near);
-    
+
     return walletAccount;
 }
 
 
-export const functionCall = async (account, contractName, methodName, param, deposit) => {
+export const functionCall2 = async (account, contractName, methodName, param, deposit) => {
 
     let res = await account.functionCall(
         contractName,
@@ -68,6 +84,74 @@ export const loginNear = async (walletAccount) => {
     );
 }
 
+export const createTransaction2 = async ({
+    receiverId,
+    actions,
+    walletAccount,
+    nonceOffset = 1
+}) => {
+    let keyStore = new nearAPI.keyStores.BrowserLocalStorageKeyStore();
+    let near = await nearAPI.connect(Object.assign({
+        deps: {
+            keyStore: keyStore
+        }
+    }, config));
+    const localKey = await near.connection.signer.getPublicKey(
+        walletAccount.account().accountId,
+        near.connection.networkId
+    )
+    const accessKey = await walletAccount
+        .account()
+        .accessKeyForTransaction(receiverId, actions, localKey)
+    if (!accessKey) {
+        throw new Error(`Cannot find matching key for transaction sent to ${receiverId}`)
+    }
+
+    const block = await near.connection.provider.block({
+        finality: 'final'
+    })
+    const blockHash = base_decode(block.header.hash)
+    const publicKey = PublicKey.from(accessKey.public_key)
+    const nonce = accessKey.access_key.nonce + nonceOffset
+
+    return createTransaction(
+        walletAccount.account().accountId,
+        publicKey,
+        receiverId,
+        nonce,
+        actions,
+        blockHash
+    )
+}
+
+export const executeMultipleTransactions = async (transactions, callbackUrl) => {
+    let walletAccount = await getWalletAccount();
+    const nearTransactions = await Promise.all(
+        transactions.map((tx, i) =>
+            createTransaction2({
+                receiverId: tx.receiverId,
+                nonceOffset: i + 1,
+                actions: tx.functionCalls.map((fc) =>
+                    functionCall(fc.methodName, fc.args, fc.gas, fc.attachedDeposit)
+                ),
+                walletAccount
+            })
+        )
+    )
+
+    // console.log(nearTransactions);
+    return walletAccount.requestSignTransactions({
+        transactions: nearTransactions,
+        callbackUrl: callbackUrl,
+    })
+}
+
+/**
+ * 
+ * End Utils
+ * 
+ */
+
 
 /**
  * 
@@ -78,7 +162,7 @@ export const loginNear = async (walletAccount) => {
 //Change Methods
 export const stakeNFT = async (account, tokenId) => {
 
-    let result = await functionCall(account, config.nftContractName, "nft_transfer_call", {
+    let result = await functionCall2(account, config.nftContractName, "nft_transfer_call", {
         "receiver_id": config.stakecontractName,
         "token_id": tokenId,
         "msg": ""
@@ -88,16 +172,16 @@ export const stakeNFT = async (account, tokenId) => {
 }
 
 export const unStakeNFT = async (account, tokenId) => {
-    let result = await functionCall(account, config.stakecontractName, "unstake", {
+    let result = await functionCall2(account, config.stakecontractName, "unstake", {
         "nft_contract_id": config.nftContractName,
-        "token_id": tokenId
+        "token_id": tokenId.toString(),
     }, 1);
 
     return result;
 }
 
 export const claimReward = async (account) => {
-    let result = await functionCall(account, config.stakecontractName, "claim", null, 1);
+    let result = await functionCall2(account, config.stakecontractName, "claim", null, 1);
 
     return result;
 }
@@ -150,7 +234,7 @@ export const getStaked = async (contract, accountId) => {
 
 //Change Methods 
 export const ft_transfer = async (account, receiverId, amount) => {
-    let result = await functionCall(account, config.ftContractName, "ft_transfer", {
+    let result = await functionCall2(account, config.ftContractName, "ft_transfer", {
         "receiver_id": receiverId,
         "amount": amount.toString(),
     }, 1);
@@ -172,5 +256,35 @@ export const ftTotalSupply = async (contract) => {
 /**
  * 
  * End Contract FT
+ * 
+ */
+
+
+/**
+ * 
+ * Begin Storage
+ * 
+ */
+
+export const storage_deposit = async (account, contractName, accountId) => {
+    let result = await functionCall2(account, contractName, "storage_deposit", {
+        "account_id": accountId
+    }, 1);
+
+    return result;
+}
+
+export const storage_balance_of = async (account, contractName, accountId) => {
+    let result = await account.viewFunction(contractName, "storage_balance_of", {
+        account_id: accountId,
+    });
+
+    return result;
+}
+
+
+/**
+ * 
+ * End Storage
  * 
  */

@@ -1,9 +1,10 @@
 import logo from "./logo.svg";
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { claimReward, getClaimable, getTotalStaked, getUserStaked, getWalletAccount, loadContract, loginNear, stakeNFT, unStakeNFT } from "./lib/contract";
+import { claimReward, executeMultipleTransactions, getClaimable, getTotalStaked, getUserStaked, getWalletAccount, loadContract, loginNear, stakeNFT, storage_balance_of, unStakeNFT } from "./lib/contract";
 import { Buffer } from 'buffer';
 import { config } from "./lib/config";
+import { parseNearAmount } from "near-api-js/lib/utils/format";
 
 // @ts-ignore
 window.Buffer = Buffer;
@@ -34,12 +35,13 @@ function App() {
     for(let staked of userStakeds){
       if(staked.staked > 0) userStaked++;
     }
+
     
     setContractStake(contract);
     setTotalStaked(totalStaked);
     setWalletAccount(walletAccount);
     setUserStaked(userStaked);
-
+    
     if(walletAccount.isSignedIn()){
       let claimable = await getClaimable(contract, walletAccount.getAccountId());
       setClaimable(claimable);
@@ -48,7 +50,44 @@ function App() {
 
   const stake = async () => {
       if(walletAccount.isSignedIn()){
-        let resp = await stakeNFT(walletAccount.account(), tokenId);
+        let txs = [];
+        let deposited = await storage_balance_of(walletAccount.account(), config.ftContractName, walletAccount.getAccountId());
+        if(!deposited){
+          txs.push({
+            receiverId: config.ftContractName,
+            functionCalls: [
+              {
+                methodName: 'storage_deposit',
+                contractId: config.ftContractName,
+                args: {
+                  account_id: walletAccount.getAccountId(),
+                },
+                attachedDeposit: parseNearAmount('0.0125'),
+                gas: config.GAS_FEE,
+              },
+            ],
+          })
+        }
+        
+        txs.push({
+          receiverId: config.nftContractName,
+          functionCalls: [
+            {
+              methodName: 'nft_transfer_call',
+              contractId: config.nftContractName,
+              args: {
+                "receiver_id": config.stakecontractName,
+                "token_id": tokenId,
+                "msg": ""
+              },
+              attachedDeposit: 1,
+              gas: config.GAS_FEE,
+            },
+          ],
+        })
+
+        let resp = await executeMultipleTransactions(txs);
+        // let resp = await stakeNFT(walletAccount.account(), tokenId);
         console.log(resp);
       }
   };
