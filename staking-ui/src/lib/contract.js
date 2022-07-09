@@ -251,14 +251,14 @@ export const ft_transfer = async (account, receiverId, amount) => {
 }
 
 //View Methods
-export const ftBalanceOf = async (contract, accountId) => {
-    return await contract.ft_balance_of({
+export const ftBalanceOf = async (contractFT, accountId) => {
+    return await contractFT.ft_balance_of({
         "account_id": accountId
     });
 }
 
-export const ftTotalSupply = async (contract) => {
-    return await contract.ft_total_supply();
+export const ftTotalSupply = async (contractFT) => {
+    return await contractFT.ft_total_supply();
 }
 
 /**

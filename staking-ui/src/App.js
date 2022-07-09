@@ -1,7 +1,7 @@
 import logo from "./logo.svg";
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { claimReward, executeMultipleTransactions, getClaimable, getTotalStaked, getUserStaked, getWalletAccount, loadContract, loginNear, stakeNFT, storage_balance_of, unStakeNFT } from "./lib/contract";
+import { claimReward, executeMultipleTransactions, ftBalanceOf, getClaimable, getStaked, getTotalStaked, getUserStaked, getWalletAccount, loadContract, loginNear, stakeNFT, storage_balance_of, unStakeNFT } from "./lib/contract";
 import { Buffer } from 'buffer';
 import { config } from "./lib/config";
 import { parseNearAmount } from "near-api-js/lib/utils/format";
@@ -16,9 +16,11 @@ function App() {
 
   //near state
   const [totalStaked, setTotalStaked] = useState(0);
-  const [userStaked, setUserStaked] = useState(0);
+  const [totalUserStaked, setUserStaked] = useState(0);
+  const [userNftStaked, setUserNftStaked] = useState(null);
   const [claimable, setClaimable] = useState(0);
   const [contractStake, setContractStake] = useState(null);
+  const [contractFt, setContractFt] = useState(null);
   const [walletAccount, setWalletAccount] = useState(null);
 
   useEffect(() => {
@@ -30,21 +32,27 @@ function App() {
   const initNear = async () => {
     let walletAccount = await getWalletAccount();
     let contract = await loadContract(config.stakecontractName);
+    let contractFt = await loadContract(config.ftContractName);
     let totalStaked = await getTotalStaked(contract);
-    let userStakeds = await getUserStaked(contract);
-    let userStaked = 0;
-    for(let staked of userStakeds){
-      if(staked.staked > 0) userStaked++;
+    let totalUserStakeds = await getUserStaked(contract);
+    let totalUserStaked = 0;
+    for(let staked of totalUserStakeds){
+      if(staked.staked > 0) totalUserStaked++;
     }
 
     
+    setContractFt(contractFt);
     setContractStake(contract);
     setTotalStaked(totalStaked);
     setWalletAccount(walletAccount);
-    setUserStaked(userStaked);
+    setUserStaked(totalUserStaked);
     
     if(walletAccount.isSignedIn()){
+      let userNftStaked = await getStaked(contract, walletAccount.getAccountId());
       let claimable = await getClaimable(contract, walletAccount.getAccountId());
+
+      console.log("userNftStaked: ", userNftStaked);
+      setUserNftStaked(userNftStaked);
       setClaimable(claimable);
     }
   }
@@ -95,6 +103,15 @@ function App() {
   
   const claim = async () => {
     if(walletAccount.isSignedIn()){
+
+      let balanceMaster = await ftBalanceOf(contractFt, config.stakecontractName);
+      let claimable = await getClaimable(contractStake, walletAccount.getAccountId());
+      
+      if(claimable > balanceMaster){
+        alert("You don't have enough tokens to claim");
+        return;
+      }
+      
       let resp = await claimReward(walletAccount.account());
       console.log(resp);
     }
@@ -143,7 +160,7 @@ function App() {
         <div class="mb-3">
         <label class="form-label" >Total Staked: {totalStaked}</label>
         <br />
-        <label class="form-label" >Total User Staked: {userStaked}</label>
+        <label class="form-label" >Total User Staked: {totalUserStaked}</label>
         <br />
         <label class="form-label" >Reward: {formatToken(claimable)}</label>
         <br />
