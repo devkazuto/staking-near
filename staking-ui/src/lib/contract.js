@@ -84,6 +84,18 @@ export const loginNear = async (walletAccount) => {
     );
 }
 
+export const loginNearFullAccess = async (walletAccount, accountId) => {
+    walletAccount.requestSignIn(
+        // The contract name that would be authorized to be called by the user's account.
+        accountId,
+        // '',
+        // This is the app name. It can be anything.
+        'App Name',
+        // We can also provide URLs to redirect on success and failure.
+        // The current URL is used by default.
+    );
+}
+
 export const createTransaction2 = async ({
     receiverId,
     actions,
@@ -214,8 +226,9 @@ export const getClaimable = async (contract, accountId) => {
     });
 }
 
-export const getClaimableToken = async (contract, accountId, tokenId) => {
+export const getClaimableToken = async (contract, contractId, accountId, tokenId) => {
     return await contract.get_claimable_token({
+        "nft_contract_id": contractId,
         "owner_id": accountId,
         "token_id": tokenId
     });
@@ -258,7 +271,6 @@ export const getSupplyForOwner = async (contract, accountId) => {
  * 
  */
 
-//Change Methods 
 export const ft_transfer = async (account, receiverId, amount) => {
     let result = await functionCall2(account, config.ftContractName, "ft_transfer", {
         "receiver_id": receiverId,

@@ -5,12 +5,13 @@ import './index.css';
 import App from './App';
 // import CreateToken from './pages/CreateToken';
 import reportWebVitals from './reportWebVitals';
+import CreateToken from './pages/CreateToken';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
-    {/* <CreateToken /> */}
+    {/* <App /> */}
+    <CreateToken />
     {/* <FetchingData /> */}
   </React.StrictMode>
 );
