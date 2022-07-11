@@ -1,7 +1,7 @@
 import getConfig from "./near";
-let config = getConfig("mainnet");
+let config = getConfig("testnet");
 const STAKE_CONTRACT_ID = process.env.STAKE_CONTRACT_ID || 'staking2.minimous34.testnet'
-const NFT_CONTRACT_ID = process.env.NFT_CONTRACT_ID || 'bi-polar.testnet'
+const NFT_CONTRACT_ID = process.env.NFT_CONTRACT_ID || 'gen0.rakkigusu.testnet'
 const FT_CONTRACT_ID = process.env.FT_CONTRACT_ID || 'minimous35.testnet'
 
 //token decimals

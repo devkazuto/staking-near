@@ -7,6 +7,15 @@
   pointer-events: none;
 }
 
+::-webkit-scrollbar-thumb {
+  background: #4767d4;
+  border-radius: 0.25rem;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
@@ -14,13 +23,10 @@
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
   color: white;
 }
 
@@ -35,4 +41,68 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.req-button {
+  color: #4a6cdf;
+  background: transparent;
+  border: 3px solid #4a6cdf;
+  padding: 0.5rem 2rem;
+  border-radius: 1rem;
+  margin: 0 1rem;
+}
+
+.req-button:hover {
+  color: #4a6cdf;
+}
+
+.bg-card {
+  border-radius: 4px;
+  color: #fafafa;
+  background: rgba(77, 84, 139, 0.35);
+  backdrop-filter: blur(5.4px);
+  -webkit-backdrop-filter: blur(5.4px);
+}
+
+.bg-list {
+  height: 100vh;
+  /* background: linear-gradient(to bottom right, #5f24ff, #2d325a, #2d325a, #5f24ff) */
+  background: radial-gradient(
+      ellipse at top,
+      rgba(47, 168, 230, 0.3) 0%,
+      rgb(255 0 0 / 0%) 70%
+    ),
+    radial-gradient(
+      ellipse at bottom,
+      rgba(247, 81, 101, 0.2) 0%,
+      rgba(0, 0, 0, 0) 70%
+    ),
+    radial-gradient(
+        ellipse at center,
+        rgba(95, 36, 255, 0.5) 0%,
+        rgba(0, 0, 0, 0) 70%
+      )
+      #202342;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-size: 1000px 1000px, 1000px 1000px, 1000px 1000px;
+  background-attachment: fixed;
+  animation: bganimation 30s infinite;
+}
+
+@keyframes bganimation {
+  0% {
+    background-position: -100% -100%, 200% 200%, -100% 200%, 200% -100%;
+  }
+  50% {
+    background-position: 150% 100%, -200% 100%, 100% 0%, 0% 100%;
+  }
+  100% {
+    background-position: -100% -100%, 200% 200%, -100% 200%, 200% -100%;
+  }
+}
+
+.scroll-control{
+  height: 40vh;
+  max-width: none;
+  overflow: auto;
 }
