@@ -10,7 +10,7 @@ function CreateToken() {
   const [tokenName, setTokenName] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [totalSupply, setTotalSupply] = useState("");
-  const [decimal, setDecimal] = useState("");
+  const [decimal, setDecimal] = useState(0);
   const [icon, setIcon] = useState("https://images.squarespace-cdn.com/content/v1/58c70bf803596e1ab1be3451/1551732801079-I4T3QWZW74QRZGGCCMQB/Screen+Shot+2019-03-04+at+12.14.27+PM.png");
 
   useEffect(() => {
