@@ -31,8 +31,8 @@ function App() {
   
   const initNear = async () => {
     let walletAccount = await getWalletAccount();
-    let contract = await loadContract(config.stakecontractName);
-    let contractFt = await loadContract(config.ftContractName);
+    let contract = await loadContract(config.stakecontractName, "STAKE");
+    let contractFt = await loadContract(config.ftContractName, "FT");
     let totalStaked = await getTotalStaked(contract);
     let totalUserStakeds = await getUserStaked(contract);
     let totalUserStaked = 0;

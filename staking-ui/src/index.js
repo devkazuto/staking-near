@@ -1,15 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import FetchingData from './pages/FetchingData';
 // import App from './App';
-import CreateToken from './pages/CreateToken';
+// import CreateToken from './pages/CreateToken';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     {/* <App /> */}
-    <CreateToken />
+    {/* <CreateToken /> */}
+    <FetchingData />
   </React.StrictMode>
 );
 

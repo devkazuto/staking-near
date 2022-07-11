@@ -20,7 +20,7 @@ import {
  * 
  */
 
-export const loadContract = async (contract_id) => {
+export const loadContract = async (contract_id, type) => {
 
     let keyStore = new nearAPI.keyStores.BrowserLocalStorageKeyStore();
     let near = await nearAPI.connect(Object.assign({
@@ -36,7 +36,7 @@ export const loadContract = async (contract_id) => {
     let contractStaking = await near.loadContract(contract_id, {
         // NOTE: This configuration only needed while NEAR is still in development
         // View methods are read only. They don't modify the state, but usually return some value.
-        viewMethods: viewMethodsStaking[contract_id],
+        viewMethods: viewMethodsStaking[type],
         // Change methods can modify the state. But you don't receive the returned value when called.
         changeMethods: [],
         // Sender is the account ID to initialize transactions.
@@ -233,6 +233,24 @@ export const getStaked = async (contract, accountId) => {
  * 
  */
 
+/**
+ * 
+ * Begin contract NFT
+ * 
+ */
+
+//view Methods
+export const getSupplyForOwner = async (contract, accountId) => {
+    return await contract.nft_supply_for_owner({
+        "account_id": accountId
+    });
+}
+
+/**
+ * 
+ * End contract NFT
+ * 
+ */
 
 /**
  * 

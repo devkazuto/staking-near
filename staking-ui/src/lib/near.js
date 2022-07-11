@@ -1,5 +1,5 @@
 const STAKE_CONTRACT_ID = process.env.STAKE_CONTRACT_ID || 'staking2.minimous34.testnet'
-
+const API_URL_PARAS = process.env.API_URL_PARAS || 'https://api-v2-mainnet.paras.id'
 export default function getConfig(env) {
 	switch (env) {
 		case 'production':
@@ -11,9 +11,11 @@ export default function getConfig(env) {
 				walletUrl: 'https://wallet.near.org',
 				helperUrl: 'https://helper.mainnet.near.org',
 				explorerUrl: 'https://explorer.mainnet.near.org',
+				apiUrl: API_URL_PARAS,
 			}
 		case 'development':
 		case 'testnet':
+			API_URL_PARAS = process.env.API_URL_PARAS || 'https://api-v3-marketplace-develop.paras.id'
 			return {
 				networkId: 'testnet',
 				nodeUrl: 'https://rpc.testnet.near.org',
@@ -21,6 +23,7 @@ export default function getConfig(env) {
 				walletUrl: 'https://wallet.testnet.near.org',
 				helperUrl: 'https://helper.testnet.near.org',
 				explorerUrl: 'https://explorer.testnet.near.org',
+				apiUrl: API_URL_PARAS,
 			}
 		case 'devnet':
 			return {

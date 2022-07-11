@@ -1,5 +1,5 @@
 import getConfig from "./near";
-let config = getConfig("testnet");
+let config = getConfig("mainnet");
 const STAKE_CONTRACT_ID = process.env.STAKE_CONTRACT_ID || 'staking2.minimous34.testnet'
 const NFT_CONTRACT_ID = process.env.NFT_CONTRACT_ID || 'bi-polar.testnet'
 const FT_CONTRACT_ID = process.env.FT_CONTRACT_ID || 'minimous35.testnet'
@@ -20,9 +20,9 @@ config.GAS_FEE_300 = `300000000000000`
 
 //view methods
 let viewMethodsStaking = {
-    [config.stakecontractName]: ['get_total_staked', 'get_user_staked', 'get_session_interval', 'get_claimable', 'get_claimable_token', 'get_staked'],
-    [config.nftContractName]: [],
-    [config.ftContractName]: ['ft_balance_of', 'ft_total_supply'],
+    "STAKE": ['get_total_staked', 'get_user_staked', 'get_session_interval', 'get_claimable', 'get_claimable_token', 'get_staked'],
+    "NFT": ['nft_supply_for_owner'],
+    "FT": ['ft_balance_of', 'ft_total_supply'],
 };
 
 export {
