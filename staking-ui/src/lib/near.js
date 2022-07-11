@@ -1,5 +1,5 @@
-const STAKE_CONTRACT_ID = process.env.STAKE_CONTRACT_ID || 'staking2.minimous34.testnet'
-const API_URL_PARAS = process.env.API_URL_PARAS || 'https://api-v2-mainnet.paras.id'
+let STAKE_CONTRACT_ID = process.env.STAKE_CONTRACT_ID || 'staking2.minimous34.testnet'
+let API_URL_PARAS = process.env.API_URL_PARAS || 'https://api-v2-mainnet.paras.id'
 export default function getConfig(env) {
 	switch (env) {
 		case 'production':
