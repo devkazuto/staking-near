@@ -12,7 +12,8 @@ use near_sdk::{
 mod nft_callbacks;
 
 pub const GAS_FOR_FT_TRANSFER: Gas = 10_000_000_000_000;
-pub const GAS_FOR_NFT_TRANSFER: Gas = 2_428_055_156_040;
+// pub const GAS_FOR_NFT_TRANSFER: Gas = 2_428_055_156_040;
+pub const GAS_FOR_NFT_TRANSFER: Gas = 20_000_000_000_000;
 
 // pub const DENOM: u128 = 1_000_000_000_000_000_000_000_000;
 pub const DENOM: u128 = 100_000_000;
@@ -293,7 +294,7 @@ impl Contract {
                     token_id.into(),
                     Some(1u64),
                     Some(String::from("Unstake NFT")),
-                    &self.nft_account.clone(),   // contract account id
+                    &nft_contract_id.clone(),    // contract account id
                     1,                           // yocto NEAR to attach
                     GAS_FOR_NFT_TRANSFER.into(), // gas to attach
                 );
@@ -343,9 +344,9 @@ impl Contract {
                     env::predecessor_account_id().clone(),
                     reward.into(),
                     Some(String::from("claim reward")),
-                    &self.ft_account.clone(), // contract account id
-                    1,                        // yocto NEAR to attach
-                    GAS_FOR_FT_TRANSFER.into(),      // gas to attach
+                    &self.ft_account.clone(),   // contract account id
+                    1,                          // yocto NEAR to attach
+                    GAS_FOR_FT_TRANSFER.into(), // gas to attach
                 );
             }
             None => {
@@ -394,9 +395,9 @@ impl Contract {
                         env::predecessor_account_id().clone(),
                         reward.into(),
                         Some(String::from("claim reward")),
-                        &self.ft_account.clone(), // contract account id
-                        1,                        // yocto NEAR to attach
-                        GAS_FOR_FT_TRANSFER.into(),      // gas to attach
+                        &self.ft_account.clone(),   // contract account id
+                        1,                          // yocto NEAR to attach
+                        GAS_FOR_FT_TRANSFER.into(), // gas to attach
                     );
                 }
                 None => {
