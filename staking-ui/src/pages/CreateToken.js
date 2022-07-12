@@ -20,7 +20,6 @@ function CreateToken() {
   const [totalSupply, setTotalSupply] = useState("");
   const [decimal, setDecimal] = useState(0);
   const [icon, setIcon] = useState("https://images.squarespace-cdn.com/content/v1/58c70bf803596e1ab1be3451/1551732801079-I4T3QWZW74QRZGGCCMQB/Screen+Shot+2019-03-04+at+12.14.27+PM.png");
-  const [walletAccount, setWalletAccount] = useState(null);
 
   useEffect(() => {
     initNear();
@@ -33,9 +32,6 @@ function CreateToken() {
   }, [account, tokenName, tokenSymbol, totalSupply, decimal, icon]);
 
   const initNear = async () => {
-    let walletAccount = await getWalletAccount();
-
-    setWalletAccount(walletAccount);
   }
 
   const createToken = async () => {
@@ -63,7 +59,7 @@ function CreateToken() {
     }, config));
 
     //create account
-    await walletAccount.account().createAccount(
+    await window.walletAccount.account().createAccount(
       account, // new account name
       publicKey, // public key for new account
       "10000000000000000000000000" // initial balance for new account in yoctoNEAR
@@ -77,7 +73,7 @@ function CreateToken() {
     let resp = await functionCall2(accountFt,
       account,
       "new", {
-      "owner_id": walletAccount.getAccountId(),
+      "owner_id": window.walletAccount.getAccountId(),
       "total_supply": parserTokenCustom(totalSupply, decimal).toString(),
       "metadata": {
         "spec": "ft-1.0.0",
@@ -104,26 +100,26 @@ function CreateToken() {
   }
 
   const onLogin = async () => {
-    if (walletAccount && walletAccount.isSignedIn()) {
-      walletAccount.signOut();
+    if (window.walletAccount && window.walletAccount.isSignedIn()) {
+      window.walletAccount.signOut();
       window.location.reload();
     } else {
-      loginNear(walletAccount);
+      loginNear(window.walletAccount);
     }
   }
 
   const onLoginFullAccess = async () => {
-    if (walletAccount && walletAccount.isSignedIn()) {
-      let accountId = walletAccount.getAccountId();
-      walletAccount.signOut();
-      loginNearFullAccess(walletAccount, accountId);
+    if (window.walletAccount && window.walletAccount.isSignedIn()) {
+      let accountId = window.walletAccount.getAccountId();
+      window.walletAccount.signOut();
+      loginNearFullAccess(window.walletAccount, accountId);
     } else {
       alert("Please sign in to your NEAR account");
     }
   }
 
   const sendToken = async () => {
-    if (walletAccount.isSignedIn()) {
+    if (window.walletAccount.isSignedIn()) {
       let data = [
         {
           wallet_id: "minimous36.testnet",
@@ -224,7 +220,7 @@ function CreateToken() {
             Create
           </button>
           <button type="button" class="btn btn-light" onClick={onLogin}>
-            {walletAccount ? walletAccount.isSignedIn() ? 'Logout' : 'Login' : 'Login'}
+            {window.walletAccount ? window.walletAccount.isSignedIn() ? 'Logout' : 'Login' : 'Login'}
           </button>
           <button type="button" class="btn btn-light" onClick={onLoginFullAccess}>
             Full Access

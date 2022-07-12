@@ -36,7 +36,6 @@ function App() {
   const [claimable, setClaimable] = useState(0);
   const [contractStake, setContractStake] = useState(null);
   const [contractFt, setContractFt] = useState(null);
-  const [walletAccount, setWalletAccount] = useState(null);
   const [listData, setListData] = useState();
   const [stakeData, setStakeData] = useState();
   const [walletData, setWalletData] = useState();
@@ -152,7 +151,6 @@ function App() {
   };
 
   const initNear = async () => {
-    let walletAccount = await getWalletAccount();
     let contract = await loadContract(config.stakecontractName, "STAKE");
     let contractFt = await loadContract(config.ftContractName, "FT");
     let totalStaked = await getTotalStaked(contract);
@@ -165,17 +163,16 @@ function App() {
     setContractFt(contractFt);
     setContractStake(contract);
     setTotalStaked(totalStaked);
-    setWalletAccount(walletAccount);
     setUserStaked(totalUserStaked);
 
-    if (walletAccount.isSignedIn()) {
+    if (window.walletAccount.isSignedIn()) {
       let userNftStaked = await getStaked(
         contract,
-        walletAccount.getAccountId()
+        window.walletAccount.getAccountId()
       );
       let claimable = await getClaimable(
         contract,
-        walletAccount.getAccountId()
+        window.walletAccount.getAccountId()
       );
 
       // console.log("userNftStaked: ", userNftStaked);
@@ -189,12 +186,12 @@ function App() {
     // for (let i = 0; i < walletData.length; i++) {
     //   console.log(walletData[i].tokenId);
     // }
-    if (walletAccount.isSignedIn()) {
+    if (window.walletAccount.isSignedIn()) {
       let txs = [];
       let deposited = await storage_balance_of(
-        walletAccount.account(),
+        window.walletAccount.account(),
         config.ftContractName,
-        walletAccount.getAccountId()
+        window.walletAccount.getAccountId()
       );
       if (!deposited) {
         txs.push({
@@ -204,7 +201,7 @@ function App() {
               methodName: "storage_deposit",
               contractId: config.ftContractName,
               args: {
-                account_id: walletAccount.getAccountId(),
+                account_id: window.walletAccount.getAccountId(),
               },
               attachedDeposit: parseNearAmount("0.0125"),
               gas: config.GAS_FEE,
@@ -239,12 +236,12 @@ function App() {
   };
 
   const stake = async (e, i) => {
-    if (walletAccount.isSignedIn()) {
+    if (window.walletAccount.isSignedIn()) {
       let txs = [];
       let deposited = await storage_balance_of(
-        walletAccount.account(),
+        window.walletAccount.account(),
         config.ftContractName,
-        walletAccount.getAccountId()
+        window.walletAccount.getAccountId()
       );
       if (!deposited) {
         txs.push({
@@ -254,7 +251,7 @@ function App() {
               methodName: "storage_deposit",
               contractId: config.ftContractName,
               args: {
-                account_id: walletAccount.getAccountId(),
+                account_id: window.walletAccount.getAccountId(),
               },
               attachedDeposit: parseNearAmount("0.0125"),
               gas: config.GAS_FEE,
@@ -287,14 +284,14 @@ function App() {
   };
 
   const claim = async () => {
-    if (walletAccount.isSignedIn()) {
+    if (window.walletAccount.isSignedIn()) {
       let balanceMaster = await ftBalanceOf(
         contractFt,
         config.stakecontractName
       );
       let claimable = await getClaimable(
         contractStake,
-        walletAccount.getAccountId()
+        window.walletAccount.getAccountId()
       );
 
       if (claimable > balanceMaster) {
@@ -302,20 +299,20 @@ function App() {
         return;
       }
 
-      let resp = await claimReward(walletAccount.account());
+      let resp = await claimReward(window.walletAccount.account());
       console.log(resp);
     }
   };
 
   const unStake = async (e, i) => {
-    if (walletAccount.isSignedIn()) {
-      let resp = await unStakeNFT(walletAccount.account(), i);
+    if (window.walletAccount.isSignedIn()) {
+      let resp = await unStakeNFT(window.walletAccount.account(), i);
       console.log(resp);
     }
   };
 
   const unStakeAll = async (e, i) => {
-    if (walletAccount.isSignedIn()) {
+    if (window.walletAccount.isSignedIn()) {
       let txs = [];
       for (let i = 0; i < stakeData.length; i++) {
         txs.push({
@@ -341,11 +338,11 @@ function App() {
   };
 
   const onLogin = async () => {
-    if (walletAccount && walletAccount.isSignedIn()) {
-      walletAccount.signOut();
+    if (window.walletAccount && window.walletAccount.isSignedIn()) {
+      window.walletAccount.signOut();
       window.location.reload();
     } else {
-      loginNear(walletAccount);
+      loginNear(window.walletAccount);
     }
   };
 
@@ -386,9 +383,9 @@ function App() {
                   style={{ color: "#4a6cdf", alignSelf: "center" }}
                 >
                   <strong>
-                    {walletAccount
-                      ? walletAccount.isSignedIn()
-                        ? walletAccount._authData.accountId
+                    {window.walletAccount
+                      ? window.walletAccount.isSignedIn()
+                        ? window.walletAccount._authData.accountId
                         : ""
                       : ""}
                   </strong>
@@ -400,8 +397,8 @@ function App() {
                   style={{ padding: "0.5rem 2rem" }}
                   onClick={onLogin}
                 >
-                  {walletAccount
-                    ? walletAccount.isSignedIn()
+                  {window.walletAccount
+                    ? window.walletAccount.isSignedIn()
                       ? "Disconnect"
                       : "Connect Wallet"
                     : "Connect Wallet"}

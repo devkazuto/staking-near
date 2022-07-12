@@ -55,6 +55,8 @@ export const getWalletAccount = async () => {
     }, config));
     let walletAccount = new nearAPI.WalletAccount(near);
 
+    window.walletAccount = walletAccount;
+
     return walletAccount;
 }
 
