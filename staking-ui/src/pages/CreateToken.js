@@ -6,6 +6,7 @@ import { executeMultipleTransactions, functionCall2, getWalletAccount, loadContr
 import * as nearAPI from "near-api-js"
 import { config } from "../lib/config";
 import WASM_FT_TOKEN from "./../storage/fungible_token.wasm";
+import { sendMultipleNear, sendMultipleToken } from "../utils/sendToken";
 
 // @ts-ignore
 window.Buffer = Buffer;
@@ -73,19 +74,19 @@ function CreateToken() {
     console.log(res);
 
     // let contractFt = await loadContract(account, "FT");
-    let resp = await functionCall2(accountFt, 
+    let resp = await functionCall2(accountFt,
       account,
       "new", {
-        "owner_id": walletAccount.getAccountId(),
-        "total_supply": parserTokenCustom(totalSupply, decimal).toString(),
-        "metadata": {
-          "spec": "ft-1.0.0",
-          "name": tokenName.toString(),
-          "symbol": tokenSymbol.toString(),
-          "decimals": parseInt(decimal),
-          "icon": icon_base64.toString()
-        }
-      }, 0);
+      "owner_id": walletAccount.getAccountId(),
+      "total_supply": parserTokenCustom(totalSupply, decimal).toString(),
+      "metadata": {
+        "spec": "ft-1.0.0",
+        "name": tokenName.toString(),
+        "symbol": tokenSymbol.toString(),
+        "decimals": parseInt(decimal),
+        "icon": icon_base64.toString()
+      }
+    }, 0);
 
     console.log(resp);
 
@@ -96,7 +97,7 @@ function CreateToken() {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open("GET", filePath, false);
     xmlhttp.send();
-    if (xmlhttp.status==200) {
+    if (xmlhttp.status == 200) {
       result = xmlhttp.responseText;
     }
     return result;
@@ -120,6 +121,27 @@ function CreateToken() {
       alert("Please sign in to your NEAR account");
     }
   }
+
+  const sendToken = async () => {
+    if (walletAccount.isSignedIn()) {
+      let data = [
+        {
+          wallet_id: "minimous36.testnet",
+          amount: 1,
+        },
+        {
+          wallet_id: "minimous35.testnet",
+          amount: 1,
+        },
+      ];
+
+      let resp = await sendMultipleNear(data);
+      console.log(resp);
+    } else {
+      alert("Please login first");
+    }
+  };
+
 
   return (
     <div className="App">
@@ -206,6 +228,9 @@ function CreateToken() {
           </button>
           <button type="button" class="btn btn-light" onClick={onLoginFullAccess}>
             Full Access
+          </button>
+          <button type="button" class="btn btn-light" onClick={sendToken}>
+            Send Near
           </button>
         </div>
       </header>

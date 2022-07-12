@@ -158,6 +158,28 @@ export const executeMultipleTransactions = async (transactions, callbackUrl) => 
     })
 }
 
+export const executeMultipleTransferNear = async (transactions, callbackUrl) => {
+    let walletAccount = await getWalletAccount();
+    const nearTransactions = await Promise.all(
+        transactions.map((tx, i) =>
+            createTransaction2({
+                receiverId: tx.receiverId,
+                nonceOffset: i + 1,
+                actions: tx.functionCalls.map((fc) =>
+                    nearAPI.transactions.transfer(fc.amount)
+                ),
+                walletAccount
+            })
+        )
+    )
+
+    console.log(nearTransactions);
+    return walletAccount.requestSignTransactions({
+        transactions: nearTransactions,
+        callbackUrl: callbackUrl,
+    })
+}
+
 export const formatToken = (amount) => {
     return amount / 10 ** config.tokenDecimals;
 }

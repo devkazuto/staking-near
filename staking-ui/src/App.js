@@ -353,26 +353,6 @@ function App() {
     return amount / 10 ** config.tokenDecimals;
   };
 
-  const sendToken = async () => {
-    if (walletAccount.isSignedIn()) {
-      let data = [
-        {
-          wallet_id: "minimous36.testnet",
-          amount: 1,
-        },
-        {
-          wallet_id: "minimous35.testnet",
-          amount: 1,
-        },
-      ];
-
-      let resp = await sendMultipleToken(walletAccount, data);
-      console.log(resp);
-    } else {
-      alert("Please login first");
-    }
-  };
-
   return (
     <>
       <nav
