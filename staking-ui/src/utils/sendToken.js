@@ -7,6 +7,8 @@ import {
 import {
   executeMultipleTransactions,
   executeMultipleTransferNear,
+  ftMetadata,
+  loadContract,
   parserToken,
   storage_balance_of
 } from "../lib/contract";
@@ -22,19 +24,22 @@ import {
 //     amount: 1,
 //   },
 // ];
-export const sendMultipleToken = async (walletAccount, dataJson) => {
+export const sendMultipleToken = async (walletAccount, dataJson, contractFtId = config.ftContractName) => {
+
+  let contractFT = await loadContract(contractFtId, "FT");
+  let ft_metadata = await ftMetadata(contractFT);
 
   let txs = [];
   for (let data of dataJson) {
-    let deposited = await storage_balance_of(walletAccount.account(), config.ftContractName, walletAccount.getAccountId());
+    let deposited = await storage_balance_of(walletAccount.account(), contractFtId, data["wallet_id"]);
     if (!deposited) {
       txs.push({
-        receiverId: config.ftContractName,
+        receiverId: contractFtId,
         functionCalls: [{
           methodName: 'storage_deposit',
-          contractId: config.ftContractName,
+          contractId: walletAccount.getAccountId(),
           args: {
-            account_id: walletAccount.getAccountId(),
+            account_id: data["wallet_id"],
           },
           attachedDeposit: parseNearAmount('0.0125'),
           gas: config.GAS_FEE,
@@ -43,13 +48,13 @@ export const sendMultipleToken = async (walletAccount, dataJson) => {
     }
 
     txs.push({
-      receiverId: config.ftContractName,
+      receiverId: contractFtId,
       functionCalls: [{
         methodName: 'ft_transfer',
-        contractId: config.ftContractName,
+        contractId: walletAccount.getAccountId(),
         args: {
           "receiver_id": data["wallet_id"],
-          "amount": parserToken(data["amount"]).toString(),
+          "amount": parserToken(data["amount"], ft_metadata.decimals).toString(),
         },
         attachedDeposit: 1,
         gas: config.GAS_FEE,

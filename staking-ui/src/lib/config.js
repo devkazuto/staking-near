@@ -22,7 +22,7 @@ config.GAS_FEE_300 = `300000000000000`
 let viewMethodsStaking = {
     "STAKE": ['get_total_staked', 'get_user_staked', 'get_session_interval', 'get_claimable', 'get_claimable_token', 'get_staked'],
     "NFT": ['nft_supply_for_owner'],
-    "FT": ['ft_balance_of', 'ft_total_supply'],
+    "FT": ['ft_balance_of', 'ft_total_supply', 'ft_metadata'],
 };
 
 export {

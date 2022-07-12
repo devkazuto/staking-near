@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
 import { Buffer } from "buffer";
-import { checkAccount, getBase64FromUrl, parserTokenCustom } from "../lib/utils";
-import { executeMultipleTransactions, functionCall2, getWalletAccount, loadContract, loginNear, loginNearFullAccess } from "../lib/contract";
+import { checkAccount, getBase64FromUrl } from "../lib/utils";
+import { executeMultipleTransactions, functionCall2, getWalletAccount, loadContract, loginNear, loginNearFullAccess, parserToken } from "../lib/contract";
 import * as nearAPI from "near-api-js"
 import { config } from "../lib/config";
 import WASM_FT_TOKEN from "./../storage/fungible_token.wasm";
@@ -74,7 +74,7 @@ function CreateToken() {
       account,
       "new", {
       "owner_id": window.walletAccount.getAccountId(),
-      "total_supply": parserTokenCustom(totalSupply, decimal).toString(),
+      "total_supply": parserToken(totalSupply, decimal).toString(),
       "metadata": {
         "spec": "ft-1.0.0",
         "name": tokenName.toString(),
@@ -131,7 +131,7 @@ function CreateToken() {
         },
       ];
 
-      let resp = await sendMultipleNear(data);
+      let resp = await sendMultipleToken(window.walletAccount, data, "token.akun009.testnet");
       console.log(resp);
     } else {
       alert("Please login first");

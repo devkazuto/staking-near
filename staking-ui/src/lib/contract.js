@@ -182,12 +182,12 @@ export const executeMultipleTransferNear = async (transactions, callbackUrl) => 
     })
 }
 
-export const formatToken = (amount) => {
-    return amount / 10 ** config.tokenDecimals;
+export const formatToken = (amount, decimals = config.tokenDecimals) => {
+    return amount / 10 ** decimals;
 }
 
-export const parserToken = (amount) => {
-    return amount * 10 ** config.tokenDecimals;
+export const parserToken = (amount, decimals = config.tokenDecimals) => {
+    return amount * 10 ** decimals;
 }
 
 /**
@@ -313,6 +313,10 @@ export const ftBalanceOf = async (contractFT, accountId) => {
 
 export const ftTotalSupply = async (contractFT) => {
     return await contractFT.ft_total_supply();
+}
+
+export const ftMetadata = async (contractFT) => {
+    return await contractFT.ft_metadata();
 }
 
 /**

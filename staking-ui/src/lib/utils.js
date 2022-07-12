@@ -20,9 +20,9 @@ export const checkAccount = async (accountId) => {
 }
 
 
-export const parserTokenCustom = (amount, decimal) => {
-    return amount * 10 ** decimal;
-}
+// export const parserTokenCustom = (amount, decimal) => {
+//     return amount * 10 ** decimal;
+// }
 
 export const getBase64FromUrl = async (url) => {
     const data = await fetch(url);
