@@ -17,6 +17,7 @@ import {
   stakeNFT,
   storage_balance_of,
   unStakeNFT,
+  getClaimableToken,
 } from "./lib/contract";
 import { Buffer } from "buffer";
 import { config } from "./lib/config";
@@ -87,12 +88,12 @@ function App() {
     //   });
     // }
     for (let i = 0; i < res.length; i++) {
-        data.push({
-          tokenId: res[i].token_id,
-          title: res[i].metadata.title,
-          imageMedia: res[i].metadata.media,
-        });
-      }
+      data.push({
+        tokenId: res[i].token_id,
+        title: res[i].metadata.title,
+        imageMedia: config.base_url + res[i].metadata.media,
+      });
+    }
     return data;
   };
 
@@ -101,15 +102,20 @@ function App() {
     let page = 0;
     let result = [];
     let contractNft = await loadContract(config.nftContractName, "NFT");
-    while(valid){
+    while (valid) {
       let skip = page * config.limit;
-      let res = await getNftsForOwner(contractNft, window.walletAccount.getAccountId(), skip, config.limit);
+      let res = await getNftsForOwner(
+        contractNft,
+        window.walletAccount.getAccountId(),
+        skip,
+        config.limit
+      );
       // console.log("data", res);
-      for(let data of res){
+      for (let data of res) {
         result.push(data);
       }
 
-      if(res.length < config.limit){
+      if (res.length < config.limit) {
         valid = false;
       }
       page++;
@@ -118,7 +124,7 @@ function App() {
     // console.log(result);
 
     return result;
-  }
+  };
 
   const checkNft = async () => {
     let dataImage = [];
@@ -143,14 +149,22 @@ function App() {
   };
 
   const getNftMedia = async (res) => {
+    let contract = await loadContract(config.stakecontractName, "STAKE");
+    let reward = await getClaimableToken(
+      contract,
+      config.nftContractName,
+      window.walletAccount.getAccountId(),
+      res.token_id
+    );
     let data = [];
-    for (let i = 0; i < res.data.data.results.length; i++) {
-      data.push({
-        tokenId: res.data.data.results[i].token_id,
-        title: res.data.data.results[i].metadata.title,
-        imageMedia: config.base_url + res.data.data.results[i].metadata.media,
-      });
-    }
+    // for (let i = 0; i < res.data.data.results.length; i++) {
+    data.push({
+      tokenId: res.token_id,
+      title: res.metadata.title,
+      imageMedia: config.base_url + res.metadata.media,
+      reward: reward,
+    });
+    // }
     // console.log(data);
     return data;
   };
@@ -170,6 +184,7 @@ function App() {
       let res = await getTokenContract(contractNft, data.token_id);
       // console.log(res);
       dataImage.push(await getNftMedia(res));
+      console.log(dataImage);
       // console.log(dataImage);
       // return dataImage;
       // .then(async (res) => {
@@ -343,6 +358,20 @@ function App() {
 
   const unStake = async (e, i) => {
     if (window.walletAccount.isSignedIn()) {
+      let balanceMaster = await ftBalanceOf(
+        contractFt,
+        config.stakecontractName
+      );
+      let claimable = await getClaimable(
+        contractStake,
+        window.walletAccount.getAccountId()
+      );
+
+      if (claimable > balanceMaster) {
+        alert("You don't have enough tokens to claim");
+        return;
+      }
+
       let resp = await unStakeNFT(window.walletAccount.account(), i);
       console.log(resp);
     }
@@ -351,6 +380,21 @@ function App() {
   const unStakeAll = async (e, i) => {
     if (window.walletAccount.isSignedIn()) {
       let txs = [];
+
+      let balanceMaster = await ftBalanceOf(
+        contractFt,
+        config.stakecontractName
+      );
+      let claimable = await getClaimable(
+        contractStake,
+        window.walletAccount.getAccountId()
+      );
+
+      if (claimable > balanceMaster) {
+        alert("You don't have enough tokens to claim");
+        return;
+      }
+
       for (let i = 0; i < stakeData.length; i++) {
         txs.push({
           receiverId: config.stakecontractName,
@@ -446,113 +490,142 @@ function App() {
         </div>
       </nav>
       <div className="App bg-list text-white">
-        <div style={{ paddingTop: "10rem" }}>
-          <div className="container">
-            <h1 className="pb-4">Rakkigusu Staking</h1>
-            <div className="row">
-              <div className="col">
-                <div className="bg-card p-3">
-                  <label className="form-label" style={{ margin: "0" }}>
-                    Total Staked: {totalStaked}
-                  </label>
-                </div>
-              </div>
-              <div className="col">
-                <div className="bg-card p-3">
-                  <label className="form-label" style={{ margin: "0" }}>
-                    Total User Staked: {totalUserStaked}
-                  </label>
-                </div>
-              </div>
-              <div className="col">
-                <div className="bg-card p-3">
-                  <label className="form-label" style={{ margin: "0" }}>
-                    Your Stake Reward: {formatToken(claimable)}
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            className="row container"
-            style={{
-              width: "100%",
-              margin: "0 auto",
-              alignItems: "center",
-              paddingTop: "2rem",
-            }}
-          >
-            <div className="col-sm-6">
-              <div className="bg-card p-4">
-                <h3 className="text-start">Wallet:</h3>
-                {walletData ? (
-                  <div className="row scroll-control">
-                    {/* {walletData.map((item, i) => (
-                      <> */}
-                    {walletData.map((item) => (
-                      <div className="col-sm-4">
-                        <div className="mb-3">
-                          <img width="100%" src={item.imageMedia} />
-                          <label>{item.title}</label>
-                        </div>
-                        <button
-                          type="button"
-                          className="btn req-button mb-3"
-                          style={{ padding: "0.5rem", margin: "0" }}
-                          onClick={(e) => {
-                            stake(e, item.tokenId);
-                          }}
-                        >
-                          Stake
-                        </button>
+        {window.walletAccount.isSignedIn() ? (
+          <div style={{ paddingTop: "10rem" }}>
+            <div className="container">
+              <h1 className="pb-4">Rakkigusu Staking</h1>
+              <div className="row">
+                <div className="col">
+                  <div className="bg-card p-3">
+                    <label className="form-label" style={{ margin: "0" }}>
+                      Total Staked: {totalStaked}/555
+                    </label>
+                    <div class="progress mt-2">
+                      <div
+                        class="progress-bar"
+                        role="progressbar"
+                        style={{
+                          color: "white",
+                          background: "#d36597",
+                          width: `${(totalUserStaked / 555) * 100}%`,
+                        }}
+                        aria-valuenow="totalUserStaked"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      >
+                        {(totalUserStaked / 555) * 100}%
                       </div>
-                    ))}
-                    {/* </>
-                    ))} */}
+                    </div>
                   </div>
-                ) : (
-                  <div className="spinner-border text-light" role="status">
-                    <span className="visually-hidden">Loading...</span>
+                </div>
+                <div className="col">
+                  <div className="bg-card p-3">
+                    <label className="form-label" style={{ margin: "0" }}>
+                      Total User Staked: {totalUserStaked}
+                    </label>
+                    <div class="progress mt-2">
+                      <div
+                        class="progress-bar"
+                        role="progressbar"
+                        style={{
+                          color: "white",
+                          background: "#d36597",
+                          width: `${(totalUserStaked / 555) * 100}%`,
+                        }}
+                        aria-valuenow="totalUserStaked"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      >
+                        {(totalUserStaked / 555) * 100}%
+                      </div>
+                    </div>
                   </div>
-                )}
+                </div>
+                <div className="col">
+                  <div className="bg-card p-3">
+                    <label className="form-label" style={{ margin: "0" }}>
+                      {formatToken(claimable, 8)} $RAKU <br />
+                      Your Total Stake Reward
+                    </label>
+                  </div>
+                </div>
               </div>
-              <button
-                type="button"
-                className="btn req-button mt-3"
-                style={{ padding: "0.5rem", margin: "0" }}
-                onClick={stakeAll}
-              >
-                Stake All
-              </button>
             </div>
-            <div className="col-sm-6">
-              <div className="bg-card p-4">
-                <h3 className="text-start">Staked:</h3>
-                {stakeData ? (
-                  <div className="row scroll-control">
-                    {stakeData.map((item, i) => (
-                      <>
-                        {item.map((data, index) => (
-                          <div className="col-sm-4">
+            <div
+              className="row container"
+              style={{
+                width: "100%",
+                margin: "0 auto",
+                alignItems: "center",
+                paddingTop: "2rem",
+              }}
+            >
+              <div className="col-sm-6">
+                <div className="bg-card p-4">
+                  <h3 className="text-start">Wallet:</h3>
+                  {walletData ? (
+                    <div className="row scroll-control">
+                      {/* {walletData.map((item, i) => (
+                      <> */}
+                      {walletData.map((item) => (
+                        <div className="col-sm-4">
+                          <div className="card-stake p-2 mb-2">
                             <div className="mb-3">
-                              <img width="100%" src={item[index].imageMedia} />
-                              <label>{item[index].title}</label>
+                              <img width="100%" src={item.imageMedia} />
+                              <h5>{item.title}</h5>
                             </div>
-                            <div className="row mb-3">
-                              <div className="col-sm-6">
-                                <button
-                                  type="button"
-                                  className="btn req-button"
-                                  style={{
-                                    padding: "0.5rem 1.1rem",
-                                    margin: "0",
-                                  }}
-                                  onClick={claim}
-                                >
-                                  Claim
-                                </button>
-                              </div>
-                              <div className="col-sm-6">
+                            <button
+                              type="button"
+                              className="btn req-button"
+                              style={{ padding: "0.5rem", margin: "0" }}
+                              onClick={(e) => {
+                                stake(e, item.tokenId);
+                              }}
+                            >
+                              Stake
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      {/* </>
+                    ))} */}
+                    </div>
+                  ) : (
+                    <div className="spinner-border text-light" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  className="btn req-button mt-3"
+                  style={{ padding: "0.5rem", margin: "0" }}
+                  onClick={stakeAll}
+                >
+                  Stake All
+                </button>
+              </div>
+              <div className="col-sm-6">
+                <div className="bg-card p-4">
+                  <h3 className="text-start">Staked:</h3>
+                  {stakeData ? (
+                    <div className="row scroll-control">
+                      {stakeData.map((item, i) => (
+                        <>
+                          {item.map((data, index) => (
+                            <div className="col-sm-4">
+                              <div className="card-stake p-2 mb-3">
+                                <div>
+                                  <img
+                                    width="100%"
+                                    src={item[index].imageMedia}
+                                  />
+                                  <h5 style={{ margin : '0'}}>{item[index].title}</h5>
+                                  <label className="mt-2 mb-3">
+                                      {formatToken(item[index].reward, 8)} $RAKU
+                                  </label>
+                                </div>
+
                                 <button
                                   type="button"
                                   className="btn req-button"
@@ -565,26 +638,38 @@ function App() {
                                 </button>
                               </div>
                             </div>
-                          </div>
-                        ))}
-                      </>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="spinner-border text-light" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                )}
-              </div>
-              <button
-                type="button"
-                className="btn req-button mt-3"
-                style={{ padding: "0.5rem", margin: "0" }}
-                onClick={unStakeAll}
-              >
-                Unstake All
-              </button>
-              {/* <header className="App-header">
+                          ))}
+                        </>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="spinner-border text-light" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  )}
+                </div>
+                <div className="container">
+                  <button
+                    type="button"
+                    className="btn req-button mt-3 mx-2"
+                    style={{
+                      padding: "0.5rem 1.1rem",
+                      margin: "0",
+                    }}
+                    onClick={claim}
+                  >
+                    Claim All
+                  </button>
+                  <button
+                    type="button"
+                    className="btn req-button mt-3 ml-2"
+                    style={{ padding: "0.5rem", margin: "0" }}
+                    onClick={unStakeAll}
+                  >
+                    Unstake All
+                  </button>
+                </div>
+                {/* <header className="App-header">
                 <div className="mb-3">
                   <br />
                   <label for="exampleFormControlInput1" className="form-label">
@@ -664,9 +749,19 @@ function App() {
                   </div>
                 </div>
               </header> */}
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div style={{ paddingTop: "10rem" }}>
+            <div className="container center-alert">
+              <h1 className="pb-4">Rakkigusu Staking</h1>
+              <h4 className="bg-card p-3" style={{ color: "#b15283" }}>
+                Connect your wallet first
+              </h4>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
