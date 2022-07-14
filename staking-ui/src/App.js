@@ -7,6 +7,8 @@ import {
   ftBalanceOf,
   getClaimable,
   getStaked,
+  getNftsForOwner,
+  getTokenContract,
   getTotalStaked,
   getUserStaked,
   getWalletAccount,
@@ -77,22 +79,54 @@ function App() {
 
   const getNft = async (res) => {
     let data = [];
-    for (let i = 0; i < res.data.data.results.length; i++) {
-      data.push({
-        tokenId: res.data.data.results[i].token_id,
-        title: res.data.data.results[i].metadata.title,
-        imageMedia: res.data.data.results[i].metadata.media,
-      });
-    }
+    // for (let i = 0; i < res.data.data.results.length; i++) {
+    //   data.push({
+    //     tokenId: res.data.data.results[i].token_id,
+    //     title: res.data.data.results[i].metadata.title,
+    //     imageMedia: res.data.data.results[i].metadata.media,
+    //   });
+    // }
+    for (let i = 0; i < res.length; i++) {
+        data.push({
+          tokenId: res[i].token_id,
+          title: res[i].metadata.title,
+          imageMedia: res[i].metadata.media,
+        });
+      }
     return data;
   };
 
+  const getAllNft = async () => {
+    let valid = true;
+    let page = 0;
+    let result = [];
+    let contractNft = await loadContract(config.nftContractName, "NFT");
+    while(valid){
+      let skip = page * config.limit;
+      let res = await getNftsForOwner(contractNft, window.walletAccount.getAccountId(), skip, config.limit);
+      // console.log("data", res);
+      for(let data of res){
+        result.push(data);
+      }
+
+      if(res.length < config.limit){
+        valid = false;
+      }
+      page++;
+    }
+
+    // console.log(result);
+
+    return result;
+  }
+
   const checkNft = async () => {
     let dataImage = [];
-    let res = await axios.get(
-      `${config.apiUrl}/token?contract_id=gen0.rakkigusu.testnet&owner_id=` +
-        "akun009.testnet"
-    );
+    // let res = await axios.get(
+    //   `${config.apiUrl}/token?contract_id=gen0.rakkigusu.testnet&owner_id=` +
+    //     "akun009.testnet"
+    // );
+    let res = await getAllNft();
     // console.log(res.data.data.results);
     dataImage = await getNft(res);
     setListData([dataImage]);
@@ -114,7 +148,7 @@ function App() {
       data.push({
         tokenId: res.data.data.results[i].token_id,
         title: res.data.data.results[i].metadata.title,
-        imageMedia: res.data.data.results[i].metadata.media,
+        imageMedia: config.base_url + res.data.data.results[i].metadata.media,
       });
     }
     // console.log(data);
@@ -125,12 +159,15 @@ function App() {
     let dataImage = [];
     // console.log(stake.length);
     // if (userNftStaked.length !== 0) {
+    let contractNft = await loadContract(config.nftContractName, "NFT");
     for (let data of stake) {
       // console.log(data);
-      let res = await axios.get(
-        `${config.apiUrl}/token?contract_id=${data.nft_contract_id}&token_id=` +
-          data.token_id
-      );
+      // let res = await axios.get(
+      //   `${config.apiUrl}/token?contract_id=${data.nft_contract_id}&token_id=` +
+      //     data.token_id
+      // );
+
+      let res = await getTokenContract(contractNft, data.token_id);
       // console.log(res);
       dataImage.push(await getNftMedia(res));
       // console.log(dataImage);

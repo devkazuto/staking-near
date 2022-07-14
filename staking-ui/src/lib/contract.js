@@ -279,10 +279,23 @@ export const getStaked = async (contract, accountId) => {
 //view Methods
 export const getSupplyForOwner = async (contract, accountId) => {
     return await contract.nft_supply_for_owner({
-        "account_id": accountId
+        "account_id": accountId,
     });
 }
 
+export const getNftsForOwner = async (contract, accountId, from_index, limit) => {
+    return await contract.nft_tokens_for_owner({
+        "account_id": accountId,
+        "from_index": from_index.toString(),
+        "limit": limit,
+    });
+}
+
+export const getTokenContract = async (contract, tokenId) => {
+    return await contract.nft_token({
+        "token_id": tokenId
+    });
+}
 /**
  * 
  * End contract NFT

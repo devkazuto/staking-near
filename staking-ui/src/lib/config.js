@@ -4,6 +4,12 @@ const STAKE_CONTRACT_ID = process.env.STAKE_CONTRACT_ID || 'staking2.minimous34.
 const NFT_CONTRACT_ID = process.env.NFT_CONTRACT_ID || 'gen0.rakkigusu.testnet'
 const FT_CONTRACT_ID = process.env.FT_CONTRACT_ID || 'minimous35.testnet'
 
+//base_url Image
+config.base_url = "https://bafybeic6r4yo2bawdbig5njcoopqlg7bcu3d6gksb6ahcor3em6h44ougi.ipfs.dweb.link/";
+
+//config limit
+config.limit = 30;
+
 //token decimals
 config.tokenDecimals = 8;
 
@@ -21,7 +27,7 @@ config.GAS_FEE_300 = `300000000000000`
 //view methods
 let viewMethodsStaking = {
     "STAKE": ['get_total_staked', 'get_user_staked', 'get_session_interval', 'get_claimable', 'get_claimable_token', 'get_staked'],
-    "NFT": ['nft_supply_for_owner'],
+    "NFT": ['nft_supply_for_owner', 'nft_token', 'nft_tokens_for_owner'],
     "FT": ['ft_balance_of', 'ft_total_supply', 'ft_metadata'],
 };
 
